@@ -1,8 +1,8 @@
 <h1 align="center">
-buffer-mover.nvim
+window-shuffler.nvim
 </h1>
 
-<p align="center"Easily move buffers between windows in Neovim, skipping excluded buffer types!</p>
+<p align="center">Easily move buffers between windows in Neovim, skipping excluded buffer types!</p>
 
 ## Features
 
