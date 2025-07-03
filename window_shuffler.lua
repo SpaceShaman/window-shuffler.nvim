@@ -86,16 +86,16 @@ function M.setup(user_config)
 	-- Setup keymaps
 	vim.keymap.set("n", config.keymaps.left, function()
 		M.move_window("h")
-	end, { desc = "Swap or move buffer left", noremap = true })
+	end, { desc = "Move buffer left", noremap = true })
 	vim.keymap.set("n", config.keymaps.down, function()
 		M.move_window("j")
-	end, { desc = "Swap or move buffer down", noremap = true })
+	end, { desc = "Move buffer down", noremap = true })
 	vim.keymap.set("n", config.keymaps.up, function()
 		M.move_window("k")
-	end, { desc = "Swap or move buffer up", noremap = true })
+	end, { desc = "Move buffer up", noremap = true })
 	vim.keymap.set("n", config.keymaps.right, function()
 		M.move_window("l")
-	end, { desc = "Swap or move buffer right", noremap = true })
+	end, { desc = "Move buffer right", noremap = true })
 end
 
 return M
