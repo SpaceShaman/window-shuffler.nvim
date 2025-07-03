@@ -4,10 +4,10 @@ local M = {}
 local config = {
 	excluded_patterns = { "neo%-tree", "^term://" },
 	keymaps = {
-		left = "<leader>j",
-		down = "<leader>k",
-		up = "<leader>l",
-		right = "<leader>;",
+		left = "<C-w>H",
+		down = "<C-w>J",
+		up = "<C-w>K",
+		right = "<C-w>L",
 	},
 }
 
