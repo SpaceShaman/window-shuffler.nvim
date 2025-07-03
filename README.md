@@ -58,6 +58,23 @@ require("window-shuffler").setup({
 })
 ```
 
+Or by setting the `opts` field in the plugin's configuration.
+
+```lua
+{
+    "SpaceShaman/window-shuffler.nvim",
+    opts = {
+      excluded_patterns = { "neo%-tree", "^term://" },
+      keymaps = {
+        left = "<C-w>H",
+        down = "<C-w>J",
+        up = "<C-w>K",
+        right = "<C-w>L",
+      },
+    },
+}
+```
+
 ### `excluded_patterns`
 
 A list of Lua patterns that match buffer names to be excluded from the window movement. By default, the plugin will skip buffers with names that start with "neo-tree" or "term://".
