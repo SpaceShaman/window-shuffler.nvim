@@ -48,6 +48,13 @@ function M.move_window(direction)
   target_win = vim.api.nvim_get_current_win()
   target_buf = vim.api.nvim_win_get_buf(target_win)
 
+  if is_special_buf(target_buf) then
+    vim.api.nvim_win_close(target_win, true)
+    vim.cmd('wincmd ' .. direction_key)
+    target_win = vim.api.nvim_get_current_win()
+    target_buf = vim.api.nvim_win_get_buf(target_win)
+  end
+
   if cur_win == target_win then
     vim.cmd('wincmd ' .. string.upper(direction_key))
     return
