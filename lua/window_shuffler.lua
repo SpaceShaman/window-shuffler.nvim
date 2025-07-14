@@ -21,59 +21,51 @@ local function is_special_buf(bufnr)
   return false
 end
 
+local function get_direction_key(direction)
+  if direction == 'left' then
+    return 'h'
+  elseif direction == 'down' then
+    return 'j'
+  elseif direction == 'up' then
+    return 'k'
+  elseif direction == 'right' then
+    return 'l'
+  end
+end
+
 function M.move_window(direction)
+  local direction_key = get_direction_key(direction)
   local cur_win = vim.api.nvim_get_current_win()
   local cur_buf = vim.api.nvim_win_get_buf(cur_win)
 
-  -- Prevent moving/swapping from excluded buffer
   if is_special_buf(cur_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
     return
   end
 
-  -- Search for next window with normal buffer in the given direction
-  local win_found = false
-  local start_win = cur_win
-  local max_jumps = vim.fn.winnr '$'
   local target_win, target_buf
+  vim.cmd('wincmd ' .. direction_key)
+  target_win = vim.api.nvim_get_current_win()
+  target_buf = vim.api.nvim_win_get_buf(target_win)
 
-  for _ = 1, max_jumps do
-    vim.cmd('wincmd ' .. direction)
-    target_win = vim.api.nvim_get_current_win()
-    if target_win == start_win then
-      break
-    end
-
-    target_buf = vim.api.nvim_win_get_buf(target_win)
-    if not is_special_buf(target_buf) then
-      win_found = true
-      break
-    end
+  if cur_win == target_win then
+    vim.cmd('wincmd ' .. string.upper(direction_key))
+    return
   end
 
-  if win_found then
-    -- Swap buffers
-    vim.api.nvim_win_set_buf(target_win, cur_buf)
-    vim.api.nvim_win_set_buf(cur_win, target_buf)
-    vim.api.nvim_set_current_win(target_win)
-  else
-    -- No normal neighbor found, create a new split and move buffer there
-    local split_cmd = {
-      h = 'leftabove vsplit',
-      l = 'rightbelow vsplit',
-      k = 'leftabove split',
-      j = 'rightbelow split',
-    }
-    vim.api.nvim_set_current_win(start_win)
-    vim.cmd(split_cmd[direction])
-    local new_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(new_win, cur_buf)
-    vim.api.nvim_set_current_win(new_win)
+  if direction == 'left' or direction == 'right' then
+    vim.cmd 'new'
+  elseif direction == 'down' or direction == 'up' then
+    vim.cmd 'vnew'
   end
+  local new_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_win_set_buf(target_win, cur_buf)
+  vim.api.nvim_win_set_buf(new_win, target_buf)
+  vim.api.nvim_win_close(cur_win, true)
+  vim.api.nvim_set_current_win(target_win)
 end
 
 function M.setup(user_config)
-  -- Merge user config
   if user_config then
     if user_config.excluded_patterns then
       config.excluded_patterns = user_config.excluded_patterns
@@ -85,16 +77,16 @@ function M.setup(user_config)
 
   -- Setup keymaps
   vim.keymap.set('n', config.keymaps.left, function()
-    M.move_window 'h'
+    M.move_window 'left'
   end, { desc = 'Move buffer left', noremap = true })
   vim.keymap.set('n', config.keymaps.down, function()
-    M.move_window 'j'
+    M.move_window 'down'
   end, { desc = 'Move buffer down', noremap = true })
   vim.keymap.set('n', config.keymaps.up, function()
-    M.move_window 'k'
+    M.move_window 'up'
   end, { desc = 'Move buffer up', noremap = true })
   vim.keymap.set('n', config.keymaps.right, function()
-    M.move_window 'l'
+    M.move_window 'right'
   end, { desc = 'Move buffer right', noremap = true })
 end
 
