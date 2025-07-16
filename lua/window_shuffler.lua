@@ -45,6 +45,7 @@ local function move_window(direction)
   local cur_win = vim.api.nvim_get_current_win()
   local cur_buf = vim.api.nvim_win_get_buf(cur_win)
   local target_win, target_buf = get_target_win_buf(direction_key)
+  local special_win = nil
 
   if is_special_buf(cur_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
@@ -52,37 +53,40 @@ local function move_window(direction)
   end
 
   if is_special_buf(target_buf) then
-    vim.api.nvim_set_current_win(target_win)
     if direction == 'left' then
-      vim.cmd 'rightbelow vnew'
+      vim.cmd 'wincmd L'
     elseif direction == 'right' then
-      vim.cmd 'leftbelow vnew'
+      vim.cmd 'wincmd H'
     elseif direction == 'down' then
-      vim.cmd 'leftabove new'
+      vim.cmd 'wincmd K'
     elseif direction == 'up' then
-      vim.cmd 'leftbelow new'
+      vim.cmd 'wincmd J'
     end
-    local new_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(new_win, cur_buf)
-    vim.api.nvim_win_close(cur_win, true)
-    return
+    special_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_set_current_win(cur_win)
+    target_win, target_buf = get_target_win_buf(direction_key)
   end
 
   if cur_win == target_win then
     vim.cmd('wincmd ' .. string.upper(direction_key))
-    return
+  else
+    if direction == 'left' or direction == 'right' then
+      vim.cmd 'new'
+    elseif direction == 'down' or direction == 'up' then
+      vim.cmd 'vnew'
+    end
+    local new_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(target_win, cur_buf)
+    vim.api.nvim_win_set_buf(new_win, target_buf)
+    vim.api.nvim_win_close(cur_win, true)
+    vim.api.nvim_set_current_win(target_win)
   end
 
-  if direction == 'left' or direction == 'right' then
-    vim.cmd 'new'
-  elseif direction == 'down' or direction == 'up' then
-    vim.cmd 'vnew'
+  if special_win then
+    vim.api.nvim_set_current_win(special_win)
+    vim.cmd('wincmd ' .. string.upper(direction_key))
+    vim.api.nvim_set_current_win(cur_win)
   end
-  local new_win = vim.api.nvim_get_current_win()
-  vim.api.nvim_win_set_buf(target_win, cur_buf)
-  vim.api.nvim_win_set_buf(new_win, target_buf)
-  vim.api.nvim_win_close(cur_win, true)
-  vim.api.nvim_set_current_win(target_win)
 end
 
 function M.setup(user_config)
