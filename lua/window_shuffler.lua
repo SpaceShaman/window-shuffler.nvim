@@ -43,13 +43,12 @@ local function move_window(direction)
   local direction_key = get_direction_key(direction)
   local cur_win = vim.api.nvim_get_current_win()
   local cur_buf = vim.api.nvim_win_get_buf(cur_win)
+  local target_win, target_buf = get_target_win_buf(direction_key)
 
   if is_special_buf(cur_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
     return
   end
-
-  local target_win, target_buf = get_target_win_buf(direction_key)
 
   if is_special_buf(target_buf) then
     vim.api.nvim_win_close(target_win, true)
