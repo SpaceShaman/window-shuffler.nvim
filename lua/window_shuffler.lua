@@ -33,7 +33,7 @@ local function get_direction_key(direction)
   end
 end
 
-function M.move_window(direction)
+local function move_window(direction)
   local direction_key = get_direction_key(direction)
   local cur_win = vim.api.nvim_get_current_win()
   local cur_buf = vim.api.nvim_win_get_buf(cur_win)
@@ -84,16 +84,16 @@ function M.setup(user_config)
 
   -- Setup keymaps
   vim.keymap.set('n', config.keymaps.left, function()
-    M.move_window 'left'
+    move_window 'left'
   end, { desc = 'Move buffer left', noremap = true })
   vim.keymap.set('n', config.keymaps.down, function()
-    M.move_window 'down'
+    move_window 'down'
   end, { desc = 'Move buffer down', noremap = true })
   vim.keymap.set('n', config.keymaps.up, function()
-    M.move_window 'up'
+    move_window 'up'
   end, { desc = 'Move buffer up', noremap = true })
   vim.keymap.set('n', config.keymaps.right, function()
-    M.move_window 'right'
+    move_window 'right'
   end, { desc = 'Move buffer right', noremap = true })
 end
 
