@@ -34,6 +34,7 @@ local function get_direction_key(direction)
 end
 
 local function get_target_win_buf(direction_key)
+  local cur_win = vim.api.nvim_get_current_win()
   vim.cmd('wincmd ' .. direction_key)
   local target_win = vim.api.nvim_get_current_win()
   return target_win, vim.api.nvim_win_get_buf(target_win)
@@ -51,10 +52,20 @@ local function move_window(direction)
   end
 
   if is_special_buf(target_buf) then
-    vim.api.nvim_win_close(target_win, true)
-    vim.cmd('wincmd ' .. direction_key)
-    target_win = vim.api.nvim_get_current_win()
-    target_buf = vim.api.nvim_win_get_buf(target_win)
+    vim.api.nvim_set_current_win(target_win)
+    if direction == 'left' then
+      vim.cmd 'rightbelow vnew'
+    elseif direction == 'right' then
+      vim.cmd 'leftbelow vnew'
+    elseif direction == 'down' then
+      vim.cmd 'leftabove new'
+    elseif direction == 'up' then
+      vim.cmd 'leftbelow new'
+    end
+    local new_win = vim.api.nvim_get_current_win()
+    vim.api.nvim_win_set_buf(new_win, cur_buf)
+    vim.api.nvim_win_close(cur_win, true)
+    return
   end
 
   if cur_win == target_win then
