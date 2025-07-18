@@ -1,5 +1,8 @@
 local M = {}
 
+--- @alias Direction 'left' | 'down' | 'up'| 'right'
+--- @alias DirectionKey 'h' | 'j' | 'k' | 'l'
+
 -- Default config
 local config = {
   excluded_patterns = { 'neo%-tree', '^term://' },
@@ -11,16 +14,8 @@ local config = {
   },
 }
 
-local function is_special_buf(bufnr)
-  local name = vim.api.nvim_buf_get_name(bufnr)
-  for _, pattern in ipairs(config.excluded_patterns) do
-    if name:match(pattern) then
-      return true
-    end
-  end
-  return false
-end
-
+--- @param direction Direction
+--- @return DirectionKey
 local function get_direction_key(direction)
   if direction == 'left' then
     return 'h'
@@ -31,61 +26,47 @@ local function get_direction_key(direction)
   elseif direction == 'right' then
     return 'l'
   end
+  error('Bad direction: ' .. direction)
 end
 
-local function get_target_win_buf(direction_key)
+--- @return integer, integer
+local function get_current_win_buf()
+  local cur_win = vim.api.nvim_get_current_win()
+  local cur_buf = vim.api.nvim_win_get_buf(cur_win)
+  return cur_win, cur_buf
+end
+
+--- @param direction Direction
+--- @return integer, integer
+local function get_target_win_buf(direction)
+  local direction_key = get_direction_key(direction)
   local cur_win = vim.api.nvim_get_current_win()
   vim.cmd('wincmd ' .. direction_key)
   local target_win = vim.api.nvim_get_current_win()
+  vim.api.nvim_set_current_win(cur_win)
   return target_win, vim.api.nvim_win_get_buf(target_win)
 end
 
-local function move_window(direction)
-  local direction_key = get_direction_key(direction)
-  local cur_win = vim.api.nvim_get_current_win()
-  local cur_buf = vim.api.nvim_win_get_buf(cur_win)
-  local target_win, target_buf = get_target_win_buf(direction_key)
-  local special_win = nil
+---@param bufnr integer
+---@return boolean
+local function is_special_buf(bufnr)
+  local name = vim.api.nvim_buf_get_name(bufnr)
+  for _, pattern in ipairs(config.excluded_patterns) do
+    if name:match(pattern) then
+      return true
+    end
+  end
+  return false
+end
 
-  if is_special_buf(cur_buf) then
+---@param direction Direction
+local function move_window(direction)
+  local curent_win, curent_buf = get_current_win_buf()
+  local target_win, target_buf = get_target_win_buf(direction)
+
+  if is_special_buf(curent_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
     return
-  end
-
-  if is_special_buf(target_buf) then
-    if direction == 'left' then
-      vim.cmd 'wincmd L'
-    elseif direction == 'right' then
-      vim.cmd 'wincmd H'
-    elseif direction == 'down' then
-      vim.cmd 'wincmd K'
-    elseif direction == 'up' then
-      vim.cmd 'wincmd J'
-    end
-    special_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_set_current_win(cur_win)
-    target_win, target_buf = get_target_win_buf(direction_key)
-  end
-
-  if cur_win == target_win then
-    vim.cmd('wincmd ' .. string.upper(direction_key))
-  else
-    if direction == 'left' or direction == 'right' then
-      vim.cmd 'new'
-    elseif direction == 'down' or direction == 'up' then
-      vim.cmd 'vnew'
-    end
-    local new_win = vim.api.nvim_get_current_win()
-    vim.api.nvim_win_set_buf(target_win, cur_buf)
-    vim.api.nvim_win_set_buf(new_win, target_buf)
-    vim.api.nvim_win_close(cur_win, true)
-    vim.api.nvim_set_current_win(target_win)
-  end
-
-  if special_win then
-    vim.api.nvim_set_current_win(special_win)
-    vim.cmd('wincmd ' .. string.upper(direction_key))
-    vim.api.nvim_set_current_win(cur_win)
   end
 end
 
