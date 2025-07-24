@@ -1,4 +1,4 @@
-*window-shuffler.nvim.txt*      For NVIM v0.8.0      Last change: 2025 July 03
+*window-shuffler.nvim.txt*      For NVIM v0.8.0      Last change: 2025 July 24
 
 ==============================================================================
 Table of Contents                     *window-shuffler.nvim-table-of-contents*
@@ -6,55 +6,56 @@ Table of Contents                     *window-shuffler.nvim-table-of-contents*
   - Features                                   |window-shuffler.nvim-features|
   - Installation                           |window-shuffler.nvim-installation|
   - Configuration                         |window-shuffler.nvim-configuration|
-window-shuffler.nvimEasily move buffers between windows in Neovim, skipping excluded buffer types!
+  - How it works                           |window-shuffler.nvim-how-it-works|
+window-shuffler.nvimSmartly shuffle Neovim windows around – layout-aware and intuitive.
 FEATURES                                       *window-shuffler.nvim-features*
 
-- Move current buffer to the next window in any direction.
-- If no window exists in the chosen direction, creates a split and moves the buffer there.
-- Skip (do not swap/move) special buffers like `neo-tree` or terminals (customizable).
-- Easy configuration and custom keymaps.
+- Move the current **window** in any direction: left, right, up, or down.
+- Automatically finds the best possible placement based on existing layout.
+- Respects window dimensions to keep your layout clean and consistent.
+- Simple setup with fully customizable keymaps.
 
 
 INSTALLATION                               *window-shuffler.nvim-installation*
 
-Using packer <https://github.com/wbthomason/packer.nvim> in lua
+Using packer <https://github.com/wbthomason/packer.nvim>:
 
 >lua
-    use {"SpaceShaman/window-shuffler.nvim", tag = '*', config = function()
+    use { "SpaceShaman/window-shuffler.nvim", tag = "*", config = function()
       require("window-shuffler").setup()
-    end}
+    end }
 <
 
-Using lazy.nvim <https://github.com/folke/lazy.nvim> in lua
+Using lazy.nvim <https://github.com/folke/lazy.nvim>:
 
 >lua
     {
-      -- amongst your other plugins
-      {'SpaceShaman/window-shuffler.nvim', version = "*", config = true}
-      -- or
-      {'SpaceShaman/window-shuffler.nvim', version = "*", opts = {--[[ things you want to change go here]]}}
+      "SpaceShaman/window-shuffler.nvim",
+      version = "*",
+      opts = {
+        -- Optional custom keymaps
+      },
     }
 <
 
-Using vim-plug <https://github.com/junegunn/vim-plug> in vimscript
+Using vim-plug <https://github.com/junegunn/vim-plug>:
 
 >vim
-    Plug 'SpaceShaman/window-shuffler.nvim', {'tag' : '*'}
+    Plug 'SpaceShaman/window-shuffler.nvim', {'tag': '*'}
     
     lua require("window-shuffler").setup()
 <
 
-You can/should specify a tag for the current major version of the plugin, to
-avoid breaking changes as this plugin evolves.
+You can (and should) pin the plugin to a tag to avoid breaking changes as
+development continues.
 
 
 CONFIGURATION                             *window-shuffler.nvim-configuration*
 
-You can configure the plugin by passing a table to the `setup` function.
+You can configure the plugin by passing a table to the `setup()` function:
 
 >lua
     require("window-shuffler").setup({
-      excluded_patterns = { "neo%-tree", "^term://" },
       keymaps = {
         left = "<C-w>H",
         down = "<C-w>J",
@@ -64,39 +65,39 @@ You can configure the plugin by passing a table to the `setup` function.
     })
 <
 
-Or by setting the `opts` field in the plugin’s configuration.
+Or by using the `opts` field in your lazy.nvim config:
 
 >lua
     {
-        "SpaceShaman/window-shuffler.nvim",
-        opts = {
-          excluded_patterns = { "neo%-tree", "^term://" },
-          keymaps = {
-            left = "<C-w>H",
-            down = "<C-w>J",
-            up = "<C-w>K",
-            right = "<C-w>L",
-          },
+      "SpaceShaman/window-shuffler.nvim",
+      opts = {
+        keymaps = {
+          left = "<C-w>H",
+          down = "<C-w>J",
+          up = "<C-w>K",
+          right = "<C-w>L",
         },
+      },
     }
 <
 
 
-EXCLUDED_PATTERNS ~
-
-A list of Lua patterns that match buffer names to be excluded from the window
-movement. By default, the plugin will skip buffers with names that start with
-"neo-tree" or "term://".
-
-
 KEYMAPS ~
 
-A table of keymaps to be used for window movement. The default keymaps are:
+A table of keybindings for directional movement. Default values are:
 
-- `<C-w>H`: Move the current buffer to the left window.
-- `<C-w>J`: Move the current buffer to the down window.
-- `<C-w>K`: Move the current buffer to the up window.
-- `<C-w>L`: Move the current buffer to the right window.
+- `<C-w>H`: Move current window to the left.
+- `<C-w>J`: Move current window downward.
+- `<C-w>K`: Move current window upward.
+- `<C-w>L`: Move current window to the right.
+
+
+HOW IT WORKS                               *window-shuffler.nvim-how-it-works*
+
+When you trigger a directional move, the plugin searches for the most logical
+location in that direction – for example, it may go around obstacles to
+maintain the layout’s flow. It ensures the moved window integrates cleanly
+with the rest of your layout.
 
 Generated by panvimdoc <https://github.com/kdheepak/panvimdoc>
 
