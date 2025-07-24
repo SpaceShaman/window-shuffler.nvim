@@ -155,7 +155,7 @@ local function move_window(direction, secound_round)
     elseif down_win and windows_have_same_width(curent_win, down_win) then
       new_win = create_new_win(down_win, 'left')
     elseif target_win then
-      new_win = create_new_win(target_win, 'left')
+      new_win = create_new_win(target_win, 'right')
     else
       vim.cmd 'wincmd J'
     end
