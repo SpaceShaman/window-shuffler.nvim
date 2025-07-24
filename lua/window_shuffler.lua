@@ -59,10 +59,31 @@ local function is_special_buf(bufnr)
   return false
 end
 
+---@param window integer
+---@param direction Direction
+---@return integer
+local function create_new_win(window, direction)
+  vim.api.nvim_set_current_win(window)
+  if direction == 'left' then
+    vim.cmd 'aboveleft new'
+  elseif direction == 'right' then
+    vim.cmd 'aboveleft new'
+  elseif direction == 'up' then
+    vim.cmd 'leftabove vnew'
+  elseif direction == 'down' then
+    vim.cmd 'leftabove vnew'
+  end
+  return vim.api.nvim_get_current_win()
+end
+
 ---@param direction Direction
 local function move_window(direction)
   local curent_win, curent_buf = get_current_win_buf()
   local target_win, target_buf = get_target_win_buf(direction)
+
+  local new_win = create_new_win(target_win, direction)
+  vim.api.nvim_win_set_buf(new_win, curent_buf)
+  vim.api.nvim_win_close(curent_win, true)
 
   if is_special_buf(curent_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
