@@ -65,29 +65,60 @@ end
 local function create_new_win(window, direction)
   vim.api.nvim_set_current_win(window)
   if direction == 'left' then
-    vim.cmd 'aboveleft new'
+    vim.cmd 'leftabove vnew'
   elseif direction == 'right' then
-    vim.cmd 'aboveleft new'
+    vim.cmd 'vnew'
   elseif direction == 'up' then
-    vim.cmd 'leftabove vnew'
+    vim.cmd 'leftabove new'
   elseif direction == 'down' then
-    vim.cmd 'leftabove vnew'
+    vim.cmd 'new'
   end
   return vim.api.nvim_get_current_win()
 end
 
 ---@param direction Direction
+---@return Direction
+local function get_opposite_direction(direction)
+  if direction == 'left' then
+    return 'right'
+  elseif direction == 'right' then
+    return 'left'
+  elseif direction == 'up' then
+    return 'down'
+  elseif direction == 'down' then
+    return 'up'
+  end
+  error('Bad direction: ' .. direction)
+end
+
+---@param direction Direction
 local function move_window(direction)
+  local direction_key = get_direction_key(direction)
   local curent_win, curent_buf = get_current_win_buf()
   local target_win, target_buf = get_target_win_buf(direction)
-
-  local new_win = create_new_win(target_win, direction)
-  vim.api.nvim_win_set_buf(new_win, curent_buf)
-  vim.api.nvim_win_close(curent_win, true)
+  local new_win
 
   if is_special_buf(curent_buf) then
     vim.notify('Moving or swapping excluded buffers is not allowed.', vim.log.levels.WARN)
     return
+  end
+
+  if is_special_buf(target_buf) then
+    local opposite_direction = get_opposite_direction(direction)
+    new_win = create_new_win(target_win, opposite_direction)
+  else
+    if direction == 'left' or direction == 'right' then
+      new_win = create_new_win(target_win, 'up')
+    else
+      new_win = create_new_win(target_win, 'left')
+    end
+  end
+
+  vim.api.nvim_win_set_buf(new_win, curent_buf)
+  vim.api.nvim_win_close(curent_win, true)
+
+  if curent_buf == target_buf then
+    vim.cmd('wincmd ' .. string.upper(direction_key))
   end
 end
 
