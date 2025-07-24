@@ -92,7 +92,9 @@ local function get_opposite_direction(direction)
 end
 
 ---@param direction Direction
-local function move_window(direction)
+---@param secound_round boolean
+local function move_window(direction, secound_round)
+  local second_round = secound_round or false
   local direction_key = get_direction_key(direction)
   local curent_win, curent_buf = get_current_win_buf()
   local target_win, target_buf = get_target_win_buf(direction)
@@ -119,6 +121,9 @@ local function move_window(direction)
 
   if curent_buf == target_buf then
     vim.cmd('wincmd ' .. string.upper(direction_key))
+  end
+  if is_special_buf(target_buf) and not second_round then
+    move_window(direction, true)
   end
 end
 
