@@ -104,22 +104,22 @@ local function move_window(direction)
       vim.cmd 'wincmd H'
     end
   elseif direction == 'up' then
-    if right_win and windows_have_same_height(curent_win, right_win) then
-      new_win = create_new_win(right_win, 'up')
-    elseif up_win and windows_have_same_width(curent_win, up_win) then
+    if up_win and windows_have_same_width(curent_win, up_win) then
       new_win = create_new_win(up_win, 'left')
+    elseif right_win and windows_have_same_height(curent_win, right_win) then
+      new_win = create_new_win(right_win, 'up')
     elseif target_win then
       new_win = create_new_win(target_win, 'left')
     else
       vim.cmd 'wincmd K'
     end
   elseif direction == 'down' then
-    if right_win and windows_have_same_height(curent_win, right_win) then
-      new_win = create_new_win(right_win, 'down')
-    elseif down_win and windows_have_same_width(curent_win, down_win) then
+    if down_win and windows_have_same_width(curent_win, down_win) then
       new_win = create_new_win(down_win, 'left')
+    elseif right_win and windows_have_same_height(curent_win, right_win) then
+      new_win = create_new_win(right_win, 'down')
     elseif target_win then
-      new_win = create_new_win(target_win, 'right')
+      new_win = create_new_win(target_win, 'left')
     else
       vim.cmd 'wincmd J'
     end
